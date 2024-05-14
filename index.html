@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Mèmes</title>
+</head>
+<body>
+    <input type="file" id="imageUpload" accept="image/*">
+    <textarea id="textInput" placeholder="Ajouter du texte..."></textarea>
+    <button id="generateBtn">Générer Mème</button>
+    <div id="preview"></div>
+
+    <script>
+        // Sélectionner les éléments HTML
+        const imageUploadInput = document.getElementById('imageUpload');
+        const textInput = document.getElementById('textInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const previewDiv = document.getElementById('preview');
+
+        // Événement lorsque l'utilisateur sélectionne une image
+        imageUploadInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            const imageUrl = URL.createObjectURL(file);
+            previewDiv.innerHTML = `<img src="${imageUrl}" alt="Image uploaded">`;
+        });
+
+        // Événement lorsque l'utilisateur clique sur le bouton de génération
+        generateBtn.addEventListener('click', function() {
+            const imageUrl = previewDiv.querySelector('img').src;
+            const text = textInput.value;
+
+            // Créer un élément canvas pour manipuler l'image
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            // Charger l'image sur le canvas
+            const image = new Image();
+            image.onload = function() {
+                canvas.width = image.width;
+                canvas.height = image.height;
+                context.drawImage(image, 0, 0);
+
+                // Ajouter du texte sur l'image
+                context.fillStyle = 'white';
+                context.font = '30px Arial';
+                context.textAlign = 'center';
+                context.fillText(text, canvas.width / 2, canvas.height - 20);
+
+                // Afficher l'image modifiée dans le div de prévisualisation
+                previewDiv.innerHTML = '';
+                previewDiv.appendChild(canvas);
+
+                // Téléchargement de l'image
+                const downloadLink = document.createElement('a');
+                downloadLink.href = canvas.toDataURL('image/png');
+                downloadLink.download = 'meme.png';
+                downloadLink.textContent = 'Télécharger le Mème';
+                previewDiv.appendChild(downloadLink);
+            };
+            image.src = imageUrl;
+        });
+    </script>
+</body>
+</html>
